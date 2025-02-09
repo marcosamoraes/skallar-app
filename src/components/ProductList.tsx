@@ -1,42 +1,173 @@
+import { useDebounce } from "@/hooks/useDebounce";
 import { useProductContext } from "@contexts/products";
-import { Product } from "@interfaces/product";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 
 const ProductList = () => {
-    const { products, loading } = useProductContext();
+    const { products, loading, pagination, fetchProducts } = useProductContext();
     const [search, setSearch] = useState<string>("");
+    const debouncedSearch = useDebounce(search, 500); // 500ms delay
 
-    const filteredProducts = useMemo(() => {
-        return products.filter((p) => 
-            p.name.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [products, search]);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        const page = Number(searchParams.get('page')) || 1;
+        fetchProducts(page, debouncedSearch);
+    }, [debouncedSearch, searchParams, fetchProducts]);
+
+    // Update URL when search changes
+    useEffect(() => {
+        if (debouncedSearch !== searchParams.get('search')) {
+            console.log('debouncedSearch:', debouncedSearch);
+            // Reset to page 1 when search changes
+            setSearchParams({ 
+                page: '1',
+                ...(debouncedSearch && { search: debouncedSearch })
+            });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedSearch]);
+
+    const handlePageChange = (page: number) => {
+        setSearchParams({ 
+            page: page.toString(),
+            ...(search && { search })
+        });
+    };
     
     if (loading) {
-        return <p>Carregando...</p>;
+        return (
+            <div className="flex justify-center items-center min-h-[200px]">
+                <p className="text-gray-500">Carregando...</p>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar produtos..."
-                className="mb-4 p-2 border rounded"
-            />
+        <div className="space-y-6">
+            <div className="flex gap-4">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar produtos..."
+                    className="flex-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
             
-            {filteredProducts.length === 0 ? (
-                <p>Nenhum produto encontrado.</p>
+            {products.length === 0 ? (
+                <div className="text-center py-8">
+                    <p className="text-gray-500">Nenhum produto encontrado.</p>
+                </div>
             ) : (
-                <ul>
-                    {filteredProducts.map((product: Product) => (
-                        <li key={product.id} className="mb-2">
-                            <strong>{product.name}</strong> - 
-                            R$ {product.price.toFixed(2)}
-                        </li>
-                    ))}
-                </ul>
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nome
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Preço
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estoque
+                                </th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {products.map((product) => (
+                                <tr key={product.id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {product.name}
+                                        </div>
+                                        {product.description && (
+                                            <div className="text-sm text-gray-500">
+                                                {product.description}
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-900">
+                                            R$ {product.price}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-900">
+                                            {product.stock}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <Link
+                                            to={`/products/${product.id}`}
+                                            className="text-blue-600 hover:text-blue-900"
+                                        >
+                                            Editar
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {pagination && (
+                <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                    <div className="flex flex-1 justify-between sm:hidden">
+                        <button
+                            onClick={() => handlePageChange(pagination.meta.current_page - 1)}
+                            disabled={!pagination.links.prev}
+                            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Anterior
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(pagination.meta.current_page + 1)}
+                            disabled={pagination.meta.current_page === pagination.meta.last_page}
+                            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Próximo
+                        </button>
+                    </div>
+                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-sm text-gray-700">
+                                Mostrando <span className="font-medium">{pagination.meta.from}</span> até{" "}
+                                <span className="font-medium">{pagination.meta.to}</span> de{" "}
+                                <span className="font-medium">{pagination.meta.total}</span> resultados
+                            </p>
+                        </div>
+                        <div>
+                            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                <button
+                                    onClick={() => handlePageChange(pagination.meta.current_page - 1)}
+                                    disabled={!pagination.links.prev}
+                                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                                >
+                                    <span className="sr-only">Anterior</span>
+                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button
+                                    onClick={() => handlePageChange(pagination.meta.current_page + 1)}
+                                    disabled={pagination.meta.current_page === pagination.meta.last_page}
+                                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                                >
+                                    <span className="sr-only">Próximo</span>
+                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
