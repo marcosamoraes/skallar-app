@@ -26,18 +26,51 @@ const ProductForm = ({ initialData, onSubmit, isLoading }: ProductFormProps) => 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium">
-          Nome do Produto
-        </label>
-        <input
-          type="text"
-          id="name"
-          value={formData.name}
-          onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          required
-          className="mt-1 block w-full rounded-md border p-2"
-        />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Nome do Produto
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            required
+            className="mt-1 block w-full rounded-md border p-2"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="price" className="block text-sm font-medium">
+            Preço
+          </label>
+          <input
+            type="number"
+            id="price"
+            value={formData.price}
+            onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
+            required
+            min="0"
+            step="0.01"
+            className="mt-1 block w-full rounded-md border p-2"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="stock" className="block text-sm font-medium">
+            Estoque
+          </label>
+          <input
+            type="number"
+            id="stock"
+            value={formData.stock}
+            onChange={e => setFormData(prev => ({ ...prev, stock: e.target.value }))}
+            required
+            min="0"
+            className="mt-1 block w-full rounded-md border p-2"
+          />
+        </div>
       </div>
 
       <div>
@@ -49,37 +82,7 @@ const ProductForm = ({ initialData, onSubmit, isLoading }: ProductFormProps) => 
           value={formData.description}
           onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
           className="mt-1 block w-full rounded-md border p-2"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="price" className="block text-sm font-medium">
-          Preço
-        </label>
-        <input
-          type="number"
-          id="price"
-          value={formData.price}
-          onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
-          required
-          min="0"
-          step="0.01"
-          className="mt-1 block w-full rounded-md border p-2"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="stock" className="block text-sm font-medium">
-          Estoque
-        </label>
-        <input
-          type="number"
-          id="stock"
-          value={formData.stock}
-          onChange={e => setFormData(prev => ({ ...prev, stock: e.target.value }))}
-          required
-          min="0"
-          className="mt-1 block w-full rounded-md border p-2"
+          rows={4}
         />
       </div>
 

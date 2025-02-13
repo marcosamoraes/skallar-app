@@ -1,6 +1,6 @@
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProductContext } from "@contexts/products";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 const ProductList = () => {
@@ -8,18 +8,19 @@ const ProductList = () => {
     const [search, setSearch] = useState<string>("");
     const debouncedSearch = useDebounce(search, 500); // 500ms delay
 
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         const page = Number(searchParams.get('page')) || 1;
-        fetchProducts(page, debouncedSearch);
+        fetchProducts(page, debouncedSearch).finally(() => {
+            searchInputRef.current?.focus();
+        });
     }, [debouncedSearch, searchParams, fetchProducts]);
 
-    // Update URL when search changes
     useEffect(() => {
         if (debouncedSearch !== searchParams.get('search')) {
-            console.log('debouncedSearch:', debouncedSearch);
-            // Reset to page 1 when search changes
             setSearchParams({ 
                 page: '1',
                 ...(debouncedSearch && { search: debouncedSearch })
@@ -47,6 +48,7 @@ const ProductList = () => {
         <div className="space-y-6">
             <div className="flex gap-4">
                 <input
+                    ref={searchInputRef}
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -60,59 +62,63 @@ const ProductList = () => {
                     <p className="text-gray-500">Nenhum produto encontrado.</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nome
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Preço
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Estoque
-                                </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Ações
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {products.map((product) => (
-                                <tr key={product.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {product.name}
-                                        </div>
-                                        {product.description && (
-                                            <div className="text-sm text-gray-500">
-                                                {product.description}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-900">
-                                            R$ {product.price}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-900">
-                                            {product.stock}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <Link
-                                            to={`/products/${product.id}`}
-                                            className="text-blue-600 hover:text-blue-900"
-                                        >
-                                            Editar
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="overflow-x-auto">
+                    <div className="inline-block min-w-full align-middle">
+                        <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">
+                                            Nome
+                                        </th>
+                                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">
+                                            Preço
+                                        </th>
+                                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">
+                                            Estoque
+                                        </th>
+                                        <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">
+                                            Ações
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {products.map((product) => (
+                                        <tr key={product.id} className="hover:bg-gray-50">
+                                            <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {product.name}
+                                                </div>
+                                                {product.description && (
+                                                    <div className="text-sm text-gray-500 truncate max-w-xs">
+                                                        {product.description}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                <div className="text-sm text-gray-900">
+                                                    R$ {String(product.price).replace(".", ",")}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                <div className="text-sm text-gray-900">
+                                                    {product.stock}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium sm:px-6">
+                                                <Link
+                                                    to={`/products/${product.id}`}
+                                                    className="text-blue-600 hover:text-blue-900"
+                                                >
+                                                    Editar
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 

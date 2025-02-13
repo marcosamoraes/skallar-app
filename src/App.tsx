@@ -11,7 +11,6 @@ const App = () => {
         <DefaultLayout>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/products/new" element={<ProductEdit />} />
             <Route path="/products/:id" element={<ProductEdit />} />
           </Routes>
         </DefaultLayout>
