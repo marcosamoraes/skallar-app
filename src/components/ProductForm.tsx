@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Product } from '@interfaces/product';
 
 interface ProductFormProps {
@@ -8,12 +8,20 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ initialData, onSubmit, isLoading }: ProductFormProps) => {
-  const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    price: initialData?.price || '',
-    stock: initialData?.stock || ''
+  const [formData, setFormData] = useState<Product>({
+    id: -1,
+    name: '',
+    price: 0,
+    stock: 0,
+    description: ''
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,7 +57,7 @@ const ProductForm = ({ initialData, onSubmit, isLoading }: ProductFormProps) => 
             type="number"
             id="price"
             value={formData.price}
-            onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
+            onChange={e => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
             required
             min="0"
             step="0.01"
@@ -65,7 +73,7 @@ const ProductForm = ({ initialData, onSubmit, isLoading }: ProductFormProps) => 
             type="number"
             id="stock"
             value={formData.stock}
-            onChange={e => setFormData(prev => ({ ...prev, stock: e.target.value }))}
+            onChange={e => setFormData(prev => ({ ...prev, stock: Number(e.target.value) }))}
             required
             min="0"
             className="mt-1 block w-full rounded-md border p-2"
