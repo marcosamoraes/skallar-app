@@ -1,0 +1,17 @@
+**Feito**
+- Ajustar ProductList table responsive
+- Focar no campo de busca após buscar produtos
+- No Cadastro de Produto está Editar Produto
+- Ajustar botão de Voltar
+- Ajustar diagramação do Cadastro e Edição de produto
+- Editar produto não está trazendo os dados do produto
+- Aplicar índice na tabela de produtos para otimizar busca por nome
+
+**Pendente**
+- Implementar testes (unitários ou de integração)
+
+- Deploy da aplicação em uma plataforma como Heroku ou Vercel (com instruções no README)
+- Máscara no preço do produto
+- Criar README
+  - Instruções de instalação e execução do projeto
+  - Descrição de dependências e ferramentas utilizadas

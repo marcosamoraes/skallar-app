@@ -1,0 +1,101 @@
+Teste Técnico - Desenvolvedor Fullstack PHP
+
+Objetivo:
+Avaliar suas habilidades técnicas em PHP (Laravel ou CodeIgniter), ReactJS, MySQL,
+integração de APIs REST, e implementação de técnicas de otimização e cache.
+
+Descrição do Desafio:
+Você deve desenvolver uma aplicação simples de gerenciamento de produtos com as
+seguintes funcionalidades:
+1. Backend (PHP com Laravel ou CodeIgniter):
+○
+Um CRUD (Create, Read, Update, Delete) de produtos.
+○
+Cada produto deve conter os seguintes campos:
+■ ID (gerado automaticamente).
+■ Nome do Produto (obrigatório).
+■ Descrição.
+■ Preço (obrigatório, numérico).
+■ Quantidade em Estoque (obrigatório, numérico).
+■ Data de Criação/Atualização (timestamps).
+○
+Implementar uma API RESTful para consumir essas informações:
+■ Endpoint para listar todos os produtos.
+■ Endpoint para criar um novo produto.
+■ Endpoint para atualizar um produto existente.
+■ Endpoint para deletar um produto.
+○
+Implementar cache nos endpoints de leitura (listar produtos) usando a
+ferramenta de cache de sua preferência (Redis, Memcached ou outra).
+2. Frontend (ReactJS):
+○
+Criar uma interface para consumir a API criada.
+○
+A interface deve ter:
+■ Uma listagem de produtos com opção de busca e paginação.
+■ Formulário para adicionar/editar produtos.
+■ Botão para deletar produtos.
+○
+Utilizar hooks do React (useState, useEffect) e preferencialmente Context
+API ou Redux para gerenciar estados.
+3. Banco de Dados (MySQL):
+○
+Criar a estrutura do banco de dados para armazenar as informações dos
+produtos.
+○
+Garantir que a estrutura seja otimizada, com índices nos campos necessários
+(ex.: busca por nome).
+4. Otimização:
+○
+Implementar cache para melhorar a performance da API de listagem.
+○
+Garantir que as consultas ao banco estejam otimizadas.
+○
+Usar boas práticas de desempenho no React, como evitar renders
+desnecessários.
+Requisitos Técnicos:
+●
+Backend: PHP 7 ou superior com Laravel ou CodeIgniter.
+●
+Frontend: ReactJS.
+●
+Banco de Dados: MySQL.
+●
+Cache: Redis ou similar.
+●
+API: RESTful.
+Critérios de Avaliação:
+1. Funcionalidade:
+○
+O sistema atende aos requisitos descritos?
+○
+Todas as funcionalidades estão funcionando corretamente?
+2. Qualidade do Código:
+○
+Organização e legibilidade.
+○
+Uso de boas práticas de desenvolvimento.
+3. Desempenho:
+○
+Uso adequado de cache e otimização no backend.
+○
+Performance da interface frontend.
+4. Documentação:
+○
+Inclua um README com:
+■ Instruções de instalação e execução do projeto.
+■ Descrição de dependências e ferramentas utilizadas.
+5. Extras (não obrigatórios):
+○
+Implementação de testes (unitários ou de integração).
+○
+Responsividade na interface (Mobile First).
+○
+Deploy da aplicação em uma plataforma como Heroku ou Vercel (com
+instruções no README).
+Entrega:
+●
+Submeta o código em um repositório público no GitHub (ou outro sistema de
+versionamento).
+●
+Inclua todas as instruções necessárias para execução e teste do projeto.
